@@ -47,4 +47,4 @@ jobs:
 
     - name: '🚀 Deploy to Azure Container Apps'
       run: |
-        az containerapp update --name dockerapphcv --resource-group rg-docker-lab --image acrhcv.azurecr.io/thisisfine:latest
+        az containerapp update --name dockerapphcv --resource-group hcv_docker --image acrhcv.azurecr.io/thisisfine:latest
