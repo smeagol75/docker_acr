@@ -1,0 +1,50 @@
+name: '19 - Github Action to push to Azure Container Registry (a)'
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+          run:
+            working-directory: './lab/19 - Github Action to push to Azure Container Registry/src'
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: '⚙️ Set VERSION'
+      id: set_version
+      run: echo "VERSION=$(date +%s)" >> $GITHUB_ENV
+      
+    - name: '🐋 Build Docker image'
+      run: docker build -f Dockerfile -t thisisfine:${{ env.VERSION }} .
+
+    - uses: azure/login@v1
+      name: '🔓 az login'
+      with:
+        creds: '{"clientId":"${{ vars.SERVICE_PRINCIPAL_CLIENT_ID }}","clientSecret":"${{ secrets.SERVICE_PRINCIPAL_CLIENT_SECRET }}","subscriptionId":"${{ vars.SUBSCRIPTION_ID }}","tenantId":"${{ vars.TENANT_ID }}"}'
+
+    - name: '🔓 Login to Azure Container Registry'
+      run: |
+        az acr login --name acrhcv
+
+    - name: '🔰 Tag Docker image'
+      run: |
+        docker tag thisisfine:${{ env.VERSION }} acrhcv.azurecr.io/thisisfine:latest
+        docker tag thisisfine:${{ env.VERSION }} acrhcv.azurecr.io/thisisfine:${{ env.VERSION }}
+
+    - name: '⬆️ Upload Docker image'
+      run: |
+        docker push acrhcv.azurecr.io/thisisfine:latest
+        docker push acrhcv.azurecr.io/thisisfine:${{ env.VERSION }}
+
+    - name: '🚀 Deploy to Azure Container Apps'
+      run: |
+        az containerapp update --name aca-thisisfine --resource-group rg-docker-lab --image acrhcv.azurecr.io/thisisfine:latest

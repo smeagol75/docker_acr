@@ -1,0 +1,15 @@
+services:
+
+    animals:
+        image: sergiobarriel/emoji-api-animals
+        ports:
+            - "5001:80"
+    foods:
+        image: sergiobarriel/emoji-api-foods      
+        ports:
+            - "5002:80"
+
+    sports:
+        image: sergiobarriel/emoji-api-sports
+        ports:
+            - "5003:80"    

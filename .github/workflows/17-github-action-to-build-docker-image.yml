@@ -1,0 +1,27 @@
+name: '17 - Github Action to Build Docker Image'
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+          run:
+            working-directory: './lab/17 - Github Action to build image/src'
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - name: '🐋 Build Docker image'
+      run: docker build -f Dockerfile -t thisisfine:latest .
+
+    - name: '🐋 List images'
+      run: docker images
